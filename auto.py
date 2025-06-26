@@ -139,7 +139,6 @@ def setup_argparser():
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
-    # Existing args...
     parser.add_argument("-u", "--user", default=None, help="User login")
     parser.add_argument("-p", "--pass", help="Password")
     parser.add_argument("--games", type=str, required=True, choices=games, nargs="+")
@@ -153,8 +152,6 @@ def setup_argparser():
     parser.add_argument("--non-golden", dest="non_golden", action="store_true")
     parser.add_argument("--schedule", type=float, const=2, nargs="?")
     parser.add_argument("-v", dest="verbose", action="store_true")
-
-    # New configuration args
     parser.add_argument("--config", help="Path to config file (default: config.yaml)")
     parser.add_argument(
         "--add-source",
