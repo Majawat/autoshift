@@ -28,7 +28,7 @@ from typing import Match, cast
 from common import _L, DEBUG, DIRNAME, INFO
 
 # from query import BL3
-from query import Key, known_games, known_platforms
+from query import Key, known_games, known_platforms, update_keys_from_sources
 from shift import ShiftClient, Status
 
 from config import Config
