@@ -15,11 +15,17 @@ class Config:
         default_config = {
             "sources": [
                 {
-                    "name": "autoshift-codes",
+                    "name": "ugoogalizer autoshift-codes",
                     "url": "https://raw.githubusercontent.com/ugoogalizer/autoshift-codes/main/shiftcodes.json",
                     "type": "json",
                     "enabled": True,
-                }
+                },
+                {
+                    "name": "Majawat autoshift-codes",
+                    "url": "https://raw.githubusercontent.com/Majawat/autoshift-codes/refs/heads/main/shiftcodes.json",
+                    "type": "json",
+                    "enabled": True,
+                },
             ],
             "duplicate_detection": True,
             "retry_failed": True,
