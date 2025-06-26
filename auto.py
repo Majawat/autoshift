@@ -31,6 +31,8 @@ from common import _L, DEBUG, DIRNAME, INFO
 from query import Key, known_games, known_platforms
 from shift import ShiftClient, Status
 
+from config import Config
+
 client: ShiftClient = None  # type: ignore
 
 LICENSE_TEXT = """\
