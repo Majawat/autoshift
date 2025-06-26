@@ -1,6 +1,5 @@
 # config.py
 import json
-import yaml
 from pathlib import Path
 from typing import List, Dict, Any
 from common import _L, DIRNAME
@@ -8,10 +7,12 @@ from common import _L, DIRNAME
 
 class Config:
     def __init__(self, config_file: str = None):
-        self.config_file = config_file or Path(DIRNAME) / "config.yaml"
+        self.config_file = (
+            Path(config_file) if config_file else Path(DIRNAME) / "config.json"
+        )
         self.data = self._load_config()
 
-    def _load_config(self) -> Dict[str, Any]:
+    def _load_config(self):
         default_config = {
             "sources": [
                 {
@@ -37,22 +38,16 @@ class Config:
 
         try:
             with open(self.config_file, "r") as f:
-                if self.config_file.suffix == ".yaml":
-                    return yaml.safe_load(f) or default_config
-                else:
-                    return json.load(f)
+                return json.load(f)
         except Exception as e:
             _L.warning(f"Error loading config: {e}. Using defaults.")
             return default_config
 
-    def _save_config(self, config: Dict[str, Any]):
+    def _save_config(self, config):
         with open(self.config_file, "w") as f:
-            if self.config_file.suffix == ".yaml":
-                yaml.dump(config, f, default_flow_style=False)
-            else:
-                json.dump(config, f, indent=2)
+            json.dump(config, f, indent=2)
 
-    def get_sources(self) -> List[Dict[str, Any]]:
+    def get_sources(self):
         return [s for s in self.data.get("sources", []) if s.get("enabled", True)]
 
     def add_source(self, name: str, url: str, source_type: str = "json"):
