@@ -144,9 +144,19 @@ class ShiftClient:
 
         self.client = requests.session()
         self.last_status = Status.NONE
-        self.cookie_file = path.join(DIRNAME, "data", ".cookies.save")
+
+        # User-specific cookie files
+        if user:
+            # Convert email to safe filename: user@domain.com -> user_at_domain_com
+            safe_user = user.replace("@", "_at_").replace(".", "_")
+            cookie_name = f".cookies_{safe_user}.save"
+        else:
+            cookie_name = ".cookies.save"
+
+        self.cookie_file = path.join(DIRNAME, "data", cookie_name)
         self.login_retry_count = 0
         self.max_login_retries = 3
+
         # try to load cookies. Query for login data if not present
         if not self.__load_cookie():
             print("First time usage: Login to your SHiFT account...")

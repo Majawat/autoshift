@@ -279,6 +279,8 @@ def main(args):
     import query
     from query import db, r_golden_keys
 
+    db.set_user(args.user)
+
     with db:
         # Handle manual code entry
         if args.add_code:

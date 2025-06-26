@@ -123,6 +123,9 @@ dmypy.json
 # key database
 keys.db
 
+# config file
+config.json
+
 # notebooks folder
 notebooks/
 
