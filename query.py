@@ -479,24 +479,25 @@ db = Database()
 def update_keys_from_sources(config):
     """Update keys from all configured sources"""
     from collections import Counter
+    from itertools import groupby
     import requests
-
-    all_keys = []
+    
+    all_keys_flat = []
     seen_codes = set()
-
+    
     for source in config.get_sources():
         _L.info(f"Checking source: {source['name']}")
-
-        if source["type"] == "json":
+        
+        if source['type'] == 'json':
             try:
-                if source["url"].startswith(("http://", "https://")):
-                    resp = requests.get(source["url"])
+                if source['url'].startswith(('http://', 'https://')):
+                    resp = requests.get(source['url'])
                     resp.raise_for_status()
                     data = resp.json()
                 else:
-                    with open(source["url"], "r") as f:
+                    with open(source['url'], 'r') as f:
                         data = json.load(f)
-
+                
                 # Handle both array format and object format
                 if isinstance(data, list) and len(data) > 0 and "codes" in data[0]:
                     codes = data[0]["codes"]
@@ -506,54 +507,62 @@ def update_keys_from_sources(config):
                     codes = data["codes"]
                 else:
                     codes = data
-
+                    
             except Exception as e:
                 _L.error(f"Error parsing source {source['name']}: {e}")
                 continue
-
+            
             for code_data in codes:
                 # Skip expired codes
-                if code_data.get("expired", False):
+                if code_data.get('expired', False):
                     continue
-
+                    
                 # Duplicate detection
-                if config.data.get("duplicate_detection", True):
-                    code_key = (
-                        code_data["code"],
-                        code_data["game"],
-                        code_data["platform"],
-                    )
+                if config.data.get('duplicate_detection', True):
+                    code_key = (code_data['code'], code_data['game'], code_data['platform'])
                     if code_key in seen_codes:
                         continue
                     seen_codes.add(code_key)
-
+                
                 keys = [Key(**code_data)]
-
+                
                 # Apply existing special handlers
-                keys = list(
-                    flatten(
-                        map(
-                            lambda key: (
-                                special_key_handler[key.game](key)
-                                if key.game in special_key_handler
-                                else [key]
-                            ),
-                            keys,
-                        )
-                    )
-                )
-
+                keys = list(flatten(map(lambda key: special_key_handler[key.game](key)
+                                   if key.game in special_key_handler
+                                   else [key], keys)))
+                
                 for key in keys:
                     key.set(game=get_short_game_key(key.game))
                     key.set(platform=get_short_platform_key(key.platform))
-
-                all_keys.extend(keys)
-
-    # Insert new keys
-    new_keys = [db.insert(key) for key in all_keys]
-
+                
+                all_keys_flat.extend(keys)
+    
+    # Insert new keys into database
+    new_keys = [db.insert(key) for key in all_keys_flat]
+    
     counts = Counter(key.game for key in new_keys if key)
     for game, count in sorted(counts.items()):
         _L.info(f"Got {count} new keys for {known_games[game]}")
-
+    
+    # Get all keys from database and structure like query_keys does
+    keys = list(db.get_keys(None, None))
+    all_keys = {}
+    
+    _g = lambda key: key.game
+    _p = lambda key: key.platform
+    for g, g_keys in groupby(sorted(keys, key=_g), _g):
+        all_keys[g] = {}
+        for platform, p_keys in groupby(sorted(g_keys, key=_p), _p):
+            if platform == "universal":
+                # Handle universal keys like original code
+                for key in p_keys:
+                    for plat in known_platforms.without("universal").keys():
+                        if g not in all_keys:
+                            all_keys[g] = {}
+                        if plat not in all_keys[g]:
+                            all_keys[g][plat] = []
+                        all_keys[g][plat].append(key.copy().set(platform=plat))
+            else:
+                all_keys[g][platform] = list(p_keys)
+    
     return all_keys
