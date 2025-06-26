@@ -139,20 +139,52 @@ def setup_argparser():
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 
-    parser.add_argument("-u", "--user", default=None, help="User login")
-    parser.add_argument("-p", "--pass", help="Password")
-    parser.add_argument("--games", type=str, required=True, choices=games, nargs="+")
+    # Required arguments
     parser.add_argument(
-        "--platforms", type=str, required=True, choices=platforms, nargs="+"
+        "--games",
+        type=str,
+        required=True,
+        choices=games,
+        nargs="+",
+        help="Games to query (single: --games bl3, multiple: --games {bl3,bl2}",
     )
     parser.add_argument(
-        "--limit", type=int, default=200, help="Max golden keys to redeem"
+        "--platforms",
+        type=str,
+        required=True,
+        choices=platforms,
+        nargs="+",
+        help="Platforms to query (single: --platforms steam, multiple: --platforms {steam,psn}",
     )
+
+    # Authentication
+    parser.add_argument(
+        "-u",
+        "--user",
+        default=None,
+        help="User login (optional, will prompt if not provided)",
+    )
+    parser.add_argument(
+        "-p", "--pass", help="Password (optional, will prompt if not provided)"
+    )
+
+    # Key filtering
     parser.add_argument("--golden", action="store_true", help="Only redeem golden keys")
-    parser.add_argument("--non-golden", dest="non_golden", action="store_true")
-    parser.add_argument("--schedule", type=float, const=2, nargs="?")
-    parser.add_argument("-v", dest="verbose", action="store_true")
-    parser.add_argument("--config", help="Path to config file (default: config.yaml)")
+    parser.add_argument(
+        "--non-golden",
+        dest="non_golden",
+        action="store_true",
+        help="Only redeem non-golden keys",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=200,
+        help="Max golden keys to redeem (default: 200, max: 255)",
+    )
+
+    # Configuration and sources
+    parser.add_argument("--config", help="Path to config file (default: config.json)")
     parser.add_argument(
         "--add-source",
         nargs=3,
@@ -169,6 +201,16 @@ def setup_argparser():
     parser.add_argument(
         "--no-duplicates", action="store_true", help="Skip duplicate detection"
     )
+
+    # Execution options
+    parser.add_argument(
+        "--schedule",
+        type=float,
+        const=2,
+        nargs="?",
+        help="Keep checking for keys every N hours (default: 2)",
+    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode")
 
     return parser
 
