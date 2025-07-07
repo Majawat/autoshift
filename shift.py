@@ -52,6 +52,13 @@ class Status(Enum):
     INVALID = "The code `{key.code}` is invalid"
     SLOWDOWN = "Too many requests"
     UNKNOWN = "An unknown Error occured: {msg}"
+    LOGIN_REQUIRED = "Session expired, please login again"
+    PLATFORM_MISMATCH = "Code not available for platform {key.platform}"
+    GAME_MISMATCH = "Code not available for game {key.game}"
+    ACCOUNT_LOCKED = "Account temporarily locked due to suspicious activity"
+    MAINTENANCE = "SHiFT services are currently under maintenance"
+    REGION_LOCKED = "Code not available in your region"
+    DAILY_LIMIT = "Daily redemption limit reached"
 
     def __init__(self, s: str):
         self.msg = s
@@ -136,6 +143,54 @@ def input_pw(qry):
         print(f"\r{qry}{'*' * len(pw)}", end=" \b")
         sys.stdout.flush()
     return pw
+
+
+def enhanced_error_detection(response_text: str, status_code: int) -> "Status":
+    """Enhanced error detection from SHiFT responses"""
+    text_lower = response_text.lower()
+
+    # Check for specific error patterns
+    error_patterns = {
+        "session": Status.LOGIN_REQUIRED,
+        "login": Status.LOGIN_REQUIRED,
+        "sign in": Status.LOGIN_REQUIRED,
+        "not available for your platform": Status.PLATFORM_MISMATCH,
+        "not available for this game": Status.GAME_MISMATCH,
+        "account locked": Status.ACCOUNT_LOCKED,
+        "account suspended": Status.ACCOUNT_LOCKED,
+        "maintenance": Status.MAINTENANCE,
+        "under maintenance": Status.MAINTENANCE,
+        "temporarily unavailable": Status.MAINTENANCE,
+        "region": Status.REGION_LOCKED,
+        "country": Status.REGION_LOCKED,
+        "daily limit": Status.DAILY_LIMIT,
+        "hourly limit": Status.DAILY_LIMIT,
+        "too many codes": Status.DAILY_LIMIT,
+        "expired": Status.EXPIRED,
+        "already been redeemed": Status.REDEEMED,
+        "already redeemed": Status.REDEEMED,
+        "invalid code": Status.INVALID,
+        "invalid shift code": Status.INVALID,
+        "not found": Status.INVALID,
+    }
+
+    for pattern, status in error_patterns.items():
+        if pattern in text_lower:
+            return status
+
+    # HTTP status code based detection
+    if status_code == 429:
+        return Status.SLOWDOWN
+    elif status_code >= 500:
+        return Status.MAINTENANCE
+    elif status_code == 401:
+        return Status.LOGIN_REQUIRED
+    elif status_code == 403:
+        return Status.ACCOUNT_LOCKED
+    elif status_code == 404:
+        return Status.INVALID
+
+    return Status.UNKNOWN(response_text[:100])
 
 
 class ShiftClient:

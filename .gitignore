@@ -125,6 +125,7 @@ keys.db
 
 # config file
 config.json
+data
 
 # notebooks folder
 notebooks/
