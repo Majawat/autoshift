@@ -340,7 +340,8 @@ def main(args):
             client = ShiftClient(args.user, args.pw)
 
         # Query all keys from configured sources
-        all_keys = update_keys_from_sources(config)
+        update_keys_from_sources(config)  # Update database with new codes
+        all_keys = query_keys(args.games, args.platforms)  # Get filtered keys
 
         # redeem 0 golden keys but only golden??... duh
         if not args.limit and args.golden:
