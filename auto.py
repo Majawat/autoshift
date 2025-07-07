@@ -142,6 +142,7 @@ def setup_argparser():
     # Required arguments
     parser.add_argument(
         "--games",
+        "--game",
         type=str,
         required=True,
         choices=games,
@@ -150,6 +151,7 @@ def setup_argparser():
     )
     parser.add_argument(
         "--platforms",
+        "--platform",
         type=str,
         required=True,
         choices=platforms,
@@ -191,7 +193,9 @@ def setup_argparser():
         metavar=("NAME", "URL", "TYPE"),
         help="Add new source: name url type",
     )
-    parser.add_argument("--sources", nargs="+", help="Override enabled sources by name")
+    parser.add_argument(
+        "--sources", "--source", nargs="+", help="Override enabled sources by name"
+    )
     parser.add_argument(
         "--add-code",
         nargs=4,
