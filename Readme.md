@@ -268,6 +268,7 @@ Example: `blps` or `bl bl2 bl3`
 |Borderlands 2|`bl2`|
 |Borderlands: The Pre-Sequel|`blps`|
 |Borderlands 3|`bl3`|
+|Borderlands 4|`bl4`|
 |Tiny Tina's Wonderlands|`ttw`|
 |Godfall|`gdfll`|
 

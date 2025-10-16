@@ -425,7 +425,7 @@ def parse_shift_orcicorn():
 
     key_url = "https://raw.githubusercontent.com/ugoogalizer/autoshift-codes/main/shiftcodes.json"
 
-    resp = requests.get(key_url)
+    resp = requests.get(key_url, timeout=30)
     if not resp:
         _L.error(f"Error querying for new keys: {resp.reason}")
         return None
@@ -511,7 +511,7 @@ def update_keys_from_sources(config):
         if source["type"] == "json":
             try:
                 if source["url"].startswith(("http://", "https://")):
-                    resp = requests.get(source["url"])
+                    resp = requests.get(source["url"], timeout=30)
                     resp.raise_for_status()
                     data = resp.json()
                 else:

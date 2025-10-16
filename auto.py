@@ -23,6 +23,7 @@
 from __future__ import print_function
 
 import sys
+from datetime import datetime
 from typing import Match, cast
 
 from common import _L, DEBUG, DIRNAME, INFO
@@ -62,7 +63,7 @@ def redeem(key: Key):
     try:
         # this may fail if there are other `{<something>}` in the string..
         _L.info("  " + status.msg.format(**locals()))
-    except:
+    except (KeyError, ValueError, TypeError):
         _L.info("  " + status.msg)
 
     return status == Status.SUCCESS

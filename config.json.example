@@ -1,0 +1,18 @@
+{
+  "sources": [
+    {
+      "name": "ugoogalizer autoshift-codes",
+      "url": "https://raw.githubusercontent.com/ugoogalizer/autoshift-codes/main/shiftcodes.json",
+      "type": "json",
+      "enabled": true
+    },
+    {
+      "name": "Majawat autoshift-codes",
+      "url": "https://raw.githubusercontent.com/Majawat/autoshift-codes/refs/heads/main/shiftcodes.json",
+      "type": "json",
+      "enabled": false
+    }
+  ],
+  "duplicate_detection": true,
+  "retry_failed": true
+}
