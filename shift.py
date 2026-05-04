@@ -172,6 +172,7 @@ def enhanced_error_detection(response_text: str, status_code: int) -> "Status":
         "invalid code": Status.INVALID,
         "invalid shift code": Status.INVALID,
         "not found": Status.INVALID,
+        "does not exist": Status.INVALID,
     }
 
     for pattern, status in error_patterns.items():

@@ -483,7 +483,14 @@ def update_keys():
     if not parse_shift_orcicorn.first_parse:
         _L.info("Checking for new keys!")
 
-    keys = list(parse_shift_orcicorn())
+    keys = []
+    for key in parse_shift_orcicorn():
+        if key.platform == "universal":
+            for plat in known_platforms.without("universal").keys():
+                keys.append(key.copy().set(platform=plat))
+        else:
+            keys.append(key)
+
     new_keys = [db.insert(key) for key in keys]
 
     counts = Counter(key.game for key in new_keys if key)
@@ -564,11 +571,17 @@ def update_keys_from_sources(config):
                     )
                 )
 
+                expanded = []
                 for key in keys:
                     key.set(game=get_short_game_key(key.game))
                     key.set(platform=get_short_platform_key(key.platform))
+                    if key.platform == "universal":
+                        for plat in known_platforms.without("universal").keys():
+                            expanded.append(key.copy().set(platform=plat))
+                    else:
+                        expanded.append(key)
 
-                all_keys_flat.extend(keys)
+                all_keys_flat.extend(expanded)
 
     # Insert new keys into database
     new_keys = [db.insert(key) for key in all_keys_flat]
@@ -586,16 +599,6 @@ def update_keys_from_sources(config):
     for g, g_keys in groupby(sorted(keys, key=_g), _g):
         all_keys[g] = {}
         for platform, p_keys in groupby(sorted(g_keys, key=_p), _p):
-            if platform == "universal":
-                # Handle universal keys like original code
-                for key in p_keys:
-                    for plat in known_platforms.without("universal").keys():
-                        if g not in all_keys:
-                            all_keys[g] = {}
-                        if plat not in all_keys[g]:
-                            all_keys[g][plat] = []
-                        all_keys[g][plat].append(key.copy().set(platform=plat))
-            else:
-                all_keys[g][platform] = list(p_keys)
+            all_keys[g][platform] = list(p_keys)
 
     return all_keys

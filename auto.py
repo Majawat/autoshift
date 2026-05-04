@@ -94,21 +94,12 @@ def query_keys(games: list[str], platforms: list[str]):
             continue
         all_keys[g] = {p: [] for p in platforms}
         for platform, p_keys in groupby(sorted(g_keys, key=_p), _p):
-            if platform not in platforms and platform != "universal":
+            if platform not in platforms:
                 continue
 
-            _ps = [platform]
-            if platform == "universal":
-                _ps = platforms.copy()
-
-            # _L.debug(f"First Keys looks like: {all_keys}")
-            # When universal, the key needs to be copied to each platform. temp_key is required to prevent iterator moving past the key before
-            # it's been copied for each platform
             for key in p_keys:
-                temp_key = key
-                for p in _ps:
-                    _L.debug(f"Platform: {p}, {key}")
-                    all_keys[g][p].append(temp_key.copy().set(platform=p))
+                _L.debug(f"Platform: {platform}, {key}")
+                all_keys[g][platform].append(key)
 
             # _L.debug(f"All Keys looks like: {all_keys}")
         for p in platforms:
