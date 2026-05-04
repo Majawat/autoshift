@@ -107,17 +107,21 @@ vowels = re.compile(r"[aeiou]", re.IGNORECASE)
 r_golden_keys = re.compile(r"^(\d+)?.*(gold|skelet).*", re.IGNORECASE)
 
 
-def print_banner(data):
-    lines = []
-    try:
-        lines.extend(data["meta"][attr] for attr in ("attribution", "permalink"))
-    except Exception:
-        lines.append("Codes provided by Orcicorn")
-        lines.append("@ https://shift.orcicorn.com/shift-code/")
+def print_banner():
+    lines = [
+        "autoshift fork by @Majawat",
+        "https://github.com/Majawat/autoshift",
+        "",
+        "SHiFT codes sourced from:",
+        "  ugoogalizer/autoshift-codes (data via mentalmars.com)",
+        "  Majawat/autoshift-codes",
+        "",
+        "Original autoshift by @Fabbi",
+    ]
 
-    longest_line = max(len(line) for line in lines) + 2
+    longest_line = max(len(line) for line in lines) + 4
     banner = "\n".join(f"{line: ^{longest_line}}" for line in lines)
-    txt = " autoshift by @Fabbi "
+    txt = " autoshift "
     banner = f"{txt:=^{longest_line}}\n{banner}\n"
     banner += "=" * longest_line
     _L.info(f"\r\033[1;5;31m{banner}\n")
@@ -446,7 +450,7 @@ def parse_shift_orcicorn():
 
     if parse_shift_orcicorn.first_parse:
         parse_shift_orcicorn.first_parse = False
-        print_banner(data)
+        print_banner()
 
     for code_data in valid_codes:
         keys: Iterable[Key] = [Key(**code_data)]
