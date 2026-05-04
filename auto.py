@@ -137,18 +137,18 @@ def setup_argparser():
         "--game",
         type=str,
         required=True,
-        choices=games,
+        choices=games + ["all"],
         nargs="+",
-        help="Games to query (single: --games bl3, multiple: --games {bl3,bl2}",
+        help="Games to query (single: --games bl3, multiple: --games bl3 bl2, or --games all)",
     )
     parser.add_argument(
         "--platforms",
         "--platform",
         type=str,
         required=True,
-        choices=platforms,
+        choices=platforms + ["all"],
         nargs="+",
-        help="Platforms to query (single: --platforms steam, multiple: --platforms {steam,psn}",
+        help="Platforms to query (single: --platforms steam, multiple: --platforms steam psn, or --platforms all)",
     )
 
     # Authentication
@@ -334,6 +334,12 @@ def main(args):
 
         if not client:
             client = ShiftClient(args.user, args.pw)
+
+        # Expand "all" shorthand
+        if "all" in args.games:
+            args.games = list(known_games.keys())
+        if "all" in args.platforms:
+            args.platforms = list(known_platforms.without("universal").keys())
 
         # Query all keys from configured sources
         update_keys_from_sources(config)  # Update database with new codes
