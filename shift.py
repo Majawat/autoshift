@@ -390,7 +390,7 @@ class ShiftClient:
     def __get_redemption_status(self, r: Response) -> tuple[str, str, str]:
         # return None
         # _L.debug(f"Result Text: {r.text}")
-        soup = BSoup(r.text, "lxml")
+        soup = BSoup(r.text, "html.parser")
         div = soup.find("div", id="check_redemption_status")
         if div:
             _L.debug(f"Result Check Redemption Status: {div.text.strip()}")
